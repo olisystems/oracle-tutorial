@@ -1,4 +1,4 @@
-pragma solidity ^>=0.4.16 <0.6.0;
+pragma solidity >=0.4.16 <0.6.0;
 
 contract OracleContract {
 
@@ -15,7 +15,7 @@ contract OracleContract {
     mapping(address => uint8[3]) oracles;
 
 
-    constructor(){
+    constructor()public{
         owner = msg.sender;
     }
     // register oracle function
@@ -33,7 +33,7 @@ contract OracleContract {
     // utility functions
 
     // generate indexes
-    function generateIndexes(address account) internal returns (uint8[3]){
+    function generateIndexes(address account) internal returns (uint8[3] memory){
         uint8[3] memory indexes;
         // first random index
         indexes[0] = getRandomIndex(account);
@@ -52,7 +52,7 @@ contract OracleContract {
     }
 
     // generate a random number from 0-9
-    function getRandomIndex(address accounts) internal returns (uint8){
+    function getRandomIndex(address account) internal returns (uint8){
         uint8 maxValue = 10;
         uint8 random = uint8(uint256(keccak256(abi.encodePacked(blockhash(block.number - nonce++), account))) % maxValue);
 
