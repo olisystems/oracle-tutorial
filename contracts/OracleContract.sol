@@ -14,10 +14,16 @@ contract OracleContract {
     // keep the record of all oracles
     mapping(address => uint8[3]) oracles;
 
-
     constructor()public{
         owner = msg.sender;
     }
+
+    // only owner modifier
+    modifier requireContractOwner(){
+        require(msg.sender == owner, 'Caller is not a contract owner');
+        _;
+    }
+
     // register oracle function
     function registerOracle() external payable {
         // require registration fee
@@ -30,7 +36,7 @@ contract OracleContract {
     }
 
     // get oracles
-    function getOracle(address account)external view returns(uint8[3] memory){
+    function getOracle(address account)external view requireContractOwner returns(uint8[3] memory){
         return oracles[account];
     }
 
