@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/olisystems/oracle-tutorial/issues"
   },
-  "homepage": "https://github.com/olisystems/oracle-tutorial#readme"
+  "homepage": "https://github.com/olisystems/oracle-tutorial#readme",
+  "dependencies": {
+    "truffle-hdwallet-provider": "^1.0.17"
+  }
 }
