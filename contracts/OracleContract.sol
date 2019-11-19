@@ -2,7 +2,29 @@ pragma solidity ^>=0.4.16 <0.6.0;
 
 contract OracleContract {
 
+    // declare constants
+
+    // contract owner
+    address private owner;
+    // nonce used to add pseudo randomness
+    uint8 private nonce = 0;
+    // registration fee required for oracle registration
+    uint256 public REGISTRATION_FEE = 1 ether;
+
+    // keep the record of all oracles
+    mapping(address => uint8[3]) oracles;
+
+
+    constructor(){
+        owner = msg.sender;
+    }
     // register oracle function
+    function registerOracle() external payable {
+        // get random indexes
+        uint8[3] memory indexes = generateIndexes(msg.sender);
+        // assign the indexes to oracles
+        oracles[msg.sender] = indexes;
+    }
 
     // request data function
 
