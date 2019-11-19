@@ -20,6 +20,9 @@ contract OracleContract {
     }
     // register oracle function
     function registerOracle() external payable {
+        // require registration fee
+        require(msg.value >= REGISTRATION_FEE, 'Registration fee is required');
+        
         // get random indexes
         uint8[3] memory indexes = generateIndexes(msg.sender);
         // assign the indexes to oracles
