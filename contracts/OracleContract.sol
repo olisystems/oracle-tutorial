@@ -29,6 +29,11 @@ contract OracleContract {
         oracles[msg.sender] = indexes;
     }
 
+    // get oracles
+    function getOracle(address account)external view returns(uint8[3] memory){
+        return oracles[account];
+    }
+
     // request data function
 
     // submit oracle response function
