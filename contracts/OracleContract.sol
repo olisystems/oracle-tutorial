@@ -9,8 +9,9 @@ contract OracleContract {
     // nonce used to add pseudo randomness
     uint8 private nonce = 0;
     // registration fee required for oracle registration
-    uint256 public REGISTRATION_FEE = 1 ether;
-
+    uint256 public constant REGISTRATION_FEE = 1 ether;
+    // number of responses to verify the oracle response
+    uint256 private constant MIN_RESPONSES = 3;
     // keep the record of all oracles
     mapping(address => uint8[3]) oracles;
 
@@ -20,12 +21,22 @@ contract OracleContract {
         bool isOpen;
         mapping(uint8 => address[]) responses;
     }
+    // token price data
+    struct TokenPrice {
+        bool hasStatus;
+        uint8 price;
+    }
 
     // keep record of all oracle responses
     mapping(bytes32 => ResponseInfo)private oracleResponses;
+    // keep record of token price
+    mapping(bytes32 => TokenPrice)tokens;
 
     // event fired when a data request is made
     event DataRequest(uint8 index, string token, uint256 timestamp);
+
+    // event fired when an oracle submits response
+    event TokenPriceInfo(string token, uint256 timestamp, uint8 price, bool verified);
 
     constructor()public{
         owner = msg.sender;
@@ -70,6 +81,29 @@ contract OracleContract {
     }
 
     // submit oracle response function
+    function submitOracleResponse(uint8 index, string token, uint256 timestamp, uint8 price) external {
+        require((oracles[msg.sender][0] == index) || (oracles[msg.sender][1] == index) || (oracles[msg.sender][2] == index), 'Index does not match request');
+        // check that response is being submitted for an open request
+        bytes32 key = bytes32(keccak256(abi.encodePacked(index, token, timestamp)));
+        require((oracleResponses[key].isOpen), 'Request is not open');
+
+        // store response
+        oracleResponses[key].responses[price].push(msg.sender);
+
+        // information is not considered verified until at least MIN_RESPONSES
+        if (oracleResponses[key].responses[price].length >= MIN_RESPONSES) {
+            // close the request
+            oracleResponses[key].isOpen = false;
+            // emit the token price info event
+            emit TokenPriceInfo(token, timestamp, price, true);
+
+            // save the price info
+            bytes32 tokenKey = keccak256(abi.encodePacked(token, timestamp));
+            tokens[tokenKey] = TokenPrice(true, price);
+        } else {
+            emit TokenPriceInfo(token, timestamp, price, false);
+        }
+    }
 
     // utility functions
 
